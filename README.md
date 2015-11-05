@@ -13,9 +13,9 @@ combo and minify `css` and `js` to html. no matter the file is online or not.
 
 ## Features
 
-+ css, js×Ô¶¯ÄÚÁª
-+ css£¬js Ñ¡ÔñĞÔÑ¹Ëõ
-+ Ö§³Ö ÅäÖÃ²»ĞèÒªcombineÄÚÁªµÄ×ÊÔ´£¬¹ıÂËÌæ»»ÅäÖÃ
++ cssã€jsè‡ªåŠ¨å†…è”
++ cssã€jså¯é€‰æ‹©å‹ç¼©
++ æ”¯æŒè¿‡æ»¤[ åœ¨linkæˆ–è€…scriptæ ‡ç­¾ä¸Šæ·»åŠ ignoreå±æ€§å³å¯ ]
 
 ## Usage
 
@@ -32,8 +32,8 @@ gulp.src('inline.html')
 ```javascript
 gulp.src('./src/*.html')
         .pipe(htmlInline({
-            minifyCss: true, // ÊÇ·ñĞèÒªÑ¹Ëõcss
-            minifyJs: true  // ÊÇ·ñĞèÒªÑ¹Ëõjs
+            minifyCss: true, // é€‰æ‹©æ˜¯å¦å‹ç¼©css
+            minifyJs: true  // é€‰æ‹©æ˜¯å¦å‹ç¼©js
         }))
 // ...
 ```
