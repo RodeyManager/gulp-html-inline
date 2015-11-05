@@ -8,7 +8,32 @@
     <meta name="apple-mobile-web-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta name="format-detection" content="telephone=no" />
-    <link rel="stylesheet" href="assets/css/a.css"/>
+    .layout{
+    background-color: white;
+    font-family: "Microsoft YaHei";
+    font-size: 1.2em;
+    color: #000;
+}
+.layout .content{
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    position: relative;
+}
+.layout .content .left{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 35%
+    height: 100%;
+}
+.layout .content .right{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 65%;
+    height: 100%;
+}
     <link rel="stylesheet" href="assets/css/b.css" ignore="true"/>
 </head>
 <body>
@@ -16,12 +41,16 @@
     <div class="app product-app details" id="app">
 
         <div class="content">
-            <p>
+            <p id="content">
                 压缩html中的css和js（可将link和script中的href或者src引入的文件直接压缩替换到html中）
             </p>
         </div>
 
     </div>
+
+    <script>;(function(){'use strict';var SYST=function(){this.name='Rodey';};window.SYST=new SYST();}).call(this);</script>
+    <script>window.onload=function(){console.log(SYST);};</script>
+    <script src="assets/js/c.js" ignore="true"></script>
 
 </body>
 </html>
