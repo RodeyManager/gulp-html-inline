@@ -1,10 +1,10 @@
 {
-  "name": "gulp-inline",
+  "name": "gulp-html-inline",
   "version": "1.0.0",
   "description": "压缩html中的css和js（可将link和script中的href或者src引入的文件直接压缩替换到html中）",
   "main": "index.js",
   "scripts": {
-    "test": "gulp-inline"
+    "test": "gulp-html-inline"
   },
   "repository": {
     "type": "git",
