@@ -37,3 +37,6 @@ gulp.src('./src/*.html')
         }))
 // ...
 ```
+
+#License
+ISC
