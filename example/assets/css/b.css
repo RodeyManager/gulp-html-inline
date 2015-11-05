@@ -1,0 +1,16 @@
+.app{
+    background-color: powderblue;
+    font-family: "Microsoft YaHei";
+    font-size: 1.2em;
+    color: #555;
+}
+.app .content{
+    width: 100%;
+    height: 100%;
+    padding: 10px 20px;
+}
+.app .content > p{
+    font-size: inherit;
+    color: orange;
+    line-height: 1.65em;
+}

@@ -45,5 +45,5 @@ Temporary Items
 #node js
 #=======================================
 
-.node_modules
+node_modules
 
