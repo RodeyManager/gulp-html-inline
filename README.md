@@ -1,4 +1,4 @@
-# gulp-inline
+# gulp-html-inline
 
 [![NPM version][npm-image]][npm-url]
 [![Downloads][downloads-image]][downloads-url]
@@ -21,7 +21,7 @@ combo and minify `css` and `js` to html. no matter the file is online or not.
 
 ```javascript
 var gulp = require('gulp');
-var htmlInline = require('gulp-inline');
+var htmlInline = require('gulp-html-inline');
 
 gulp.src('inline.html')
     .pipe(htmlInline({ minifyCss: false, minifyJs: true }))

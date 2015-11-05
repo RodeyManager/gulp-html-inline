@@ -8,10 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RodeyManager/gulp-inline.git"
+    "url": "git+https://github.com/RodeyManager/gulp-html-inline.git"
   },
   "keywords": [
-    "gulp-inline",
+    "gulp-html-inline",
     "html",
     "css",
     "script"
@@ -19,18 +19,14 @@
   "author": "Rodey",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/RodeyManager/gulp-inline/issues"
+    "url": "https://github.com/RodeyManager/gulp-html-inline/issues"
   },
-  "homepage": "https://github.com/RodeyManager/gulp-inline#readme",
+  "homepage": "https://github.com/RodeyManager/gulp-html-inline#readme",
   "devDependencies": {
-    "cheerio": "^0.19.0",
     "gulp": "^3.9.0",
     "gulp-util": "^3.0.7",
-    "jsmin-sourcemap": "^0.16.0",
     "jsmin2": "^1.1.7",
     "through2": "^2.0.0",
-    "uglify-js": "^2.5.0",
-    "uglifycss": "0.0.18",
-    "uglifyjs": "^2.4.10"
+    "uglifycss": "0.0.18"
   }
 }
