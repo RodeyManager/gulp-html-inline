@@ -28,6 +28,44 @@ gulp.src('inline.html')
     .pipe(gulp.dest('dist'));
 ```
 
+## Html
+```html
+    <!-- link tag -->
+    <link rel="stylesheet" href="assets/css/a.css"/>
+    <link rel="stylesheet" href="assets/css/b.css" ignore/>
+
+    <!-- style tag -->
+    <style ignore>
+        #content{
+            padding: 20px;
+            border: 1px solid rgba(0,0,0,.3);
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+        }
+    </style>
+
+    <!-- script tag -->
+    <script src="assets/js/a.js"></script>
+    <script src="assets/js/b.js"></script>
+    <script src="assets/js/c.js" ignore></script>
+    <script>
+        var a = 0,
+                b = 1;
+        var arr = [];
+        arr.push(a);
+        arr.push(b);
+    </script>
+
+```
+```html
+<!-- builder: main.min.js -->
+<script src="assets/js/a.js"></script>
+<script src="assets/js/b.js"></script>
+<script src="assets/js/c.js"></script>
+<!-- builder end -->
+```
+
 ## Options
 ```javascript
 gulp.src('./src/*.html')
