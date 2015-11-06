@@ -4,10 +4,10 @@
 [![Downloads][downloads-image]][downloads-url]
 ![cise](http://cise.alibaba-inc.com/task/69703/status.svg)
 
-[npm-image]: https://img.shields.io/npm/v/gulp-htmlone.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/gulp-htmlone
-[downloads-image]: http://img.shields.io/npm/dm/gulp-htmlone.svg?style=flat-square
-[downloads-url]: https://npmjs.org/package/gulp-htmlone
+[npm-image]: https://img.shields.io/npm/v/gulp-html-inline.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/gulp-html-inline
+[downloads-image]: http://img.shields.io/npm/dm/gulp-html-inline.svg?style=flat-square
+[downloads-url]: https://npmjs.org/package/gulp-html-inline
 
 combo and minify `css` and `js` to html. no matter the file is online or not.
 
