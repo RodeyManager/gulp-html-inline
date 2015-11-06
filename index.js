@@ -5,42 +5,78 @@
 var fs          = require('fs'),
     path        = require('path'),
     through2    = require('through2'),
-    Stream      = require('stream'),
-    cheerio     = require('cheerio'),
     uglifycss   = require('uglifycss'),
     jsmin       = require('jsmin2'),
     PluginError = require('gulp-util').PluginError;
 
-var PLUGIN_NAME = 'gulp-inline';
+var PLUGIN_NAME = 'gulp-html-inline';
 
 var linkRegx    = new RegExp('<link\\s+[\\s\\S]*?>[\\s\\S]*?<*\\/*>*', 'gi'),
     hrefRegx    = new RegExp('\\s*(href)="+([\\s\\S]*?)"'),
-    scriptRegx  = new RegExp('<script\\s+[\\s\\S]*?>[\\s\\S]*?<\\/script>', 'gi'),
+    styleRegx   = new RegExp('<style\\s*[\\s\\S]*?>[\\s\\S]*?<\\/style>', 'gi'),
+    jsRegx      = new RegExp('<script\\s+[\\s\\S]*?>[\\s\\S]*?<\\/script>', 'gi'),
+    scriptRegx  = new RegExp('<script\\s*[\\s\\S]*?>[\\s\\S]*?<\\/script>', 'gi'),
     srcRegx     = new RegExp('\\s*(src)="+([\\s\\S]*?)"');
 
-//replace callback
-var replaceCallback = function(sourceRegx, match, parentFile, type, options){
-    var ms = sourceRegx.exec(match), code = '',
-        isMinifyCss = options && !!options.minifyCss,
+var joint = function(tag, content){
+    return '<'+ tag +'>' + content + '</'+ tag +'>';
+};
+
+//压缩内联css代码 | js脚本
+var miniInline = function(content, type, options){
+    var isMinifyCss = options && !!options.minifyCss,
         isMinifyJs  = options && !!options.minifyJs,
-        attr = ms[1] || '',
-        href = ms[2] || '',
-        sourceFile = path.normalize(path.dirname(parentFile) + path.sep + href),
+        code = content,
+        tags;
+    //console.log(content);
+    tags = content.match(/<[\s\S]*?<*\/*[\s\S]*?>/gi);
+    //console.log(tags);
+    if(tags && tags[0] && tags[0].indexOf('ignore') !== -1)
+        return content;
+
+    if('css' === type){
+        if(!isMinifyCss) return content;
+        code = uglifycss.processString(content, options);
+    }
+    else if('js' === type){
+        if(!isMinifyJs) return content;
+        code = jsmin(content, options).code.replace(/\n*\t*/gi, '');
+    }
+    return code;
+};
+
+//replace callback src | href
+var replaceCallback = function(sourceRegx, match, parentFile, type, options){
+
+    var ms = sourceRegx.exec(match),
+        code = '',
+        isMinifyCss = options && !!options.minifyCss,
+        isMinifyJs  = options && !!options.minifyJs;
+    if(!ms || !ms[2] || '' === ms[2]){
+        return miniInline(match, type, options);
+    }
+    var attr = ms[1] || '',
+        href = ms[2] || '';
+
+    var sourceFile = path.normalize(path.dirname(parentFile) + path.sep + href),
         content = getFileContent(sourceFile);
 
     if(/ignore/gi.test(match))
         return match;
-    if(type === 'css'){
-        if(!isMinifyCss) return content;
+    if('css' === type){
+        if(!isMinifyCss)
+            return joint('style', content);
         code = uglifycss.processString(content, options);
-        return '<style>' + code + '</style>'
+        code = joint('style', code);
+    }
+    else if('js' === type){
+        if(!isMinifyJs)
+            return joint('script', content);
+        code = jsmin(content, options).code.replace(/\n*\t*/gi, '');
+        code = joint('script', code);
     }
 
-    if(type === 'js' && isMinifyJs){
-        if(!isMinifyJs) return content;
-        code = jsmin(content, options).code.replace(/\n*\t*/gi, '');
-        return '<script>' + code + '</script>';
-    }
+    return code;
 
 };
 
@@ -50,13 +86,40 @@ var execture = function(file, options){
     var parentFile = path.normalize(file.path);
     var fileContents = file.contents.toString('utf8');
     //获取单个标签的替换内容（已压缩）
-    var content = fileContents.replace(linkRegx, function($1){
+    var content = fileContents
+        //like: <link rel="stylesheet" href="assets/css/a.css" />
+        .replace(linkRegx, function($1){
 
-        return replaceCallback(hrefRegx, $1, parentFile, 'css', options);
-    }).replace(scriptRegx, function($1){
+            return replaceCallback(hrefRegx, $1, parentFile, 'css', options);
+        })
+        //like: <script src="assets/js/a.js"></script>
+        .replace(jsRegx, function($1){
+            //console.log($1);
+            return replaceCallback(srcRegx, $1, parentFile, 'js', options);
+        })
+        //like:
+        // <style ignore>
+        //  #app{
+        //      width: 80%;
+        //      padding: 10px;
+        //  }
+        // </style>
+        .replace(styleRegx, function($1){
+            //console.log($1);
+            return miniInline($1, 'css', options);
+        })
+        //like:
+        // <script ignore>
+        //      var a = 0,
+        //          b = 0;
+        //      var arr = [];
+        //      arr.push(a);
+        //      arr.push(b);
+        // </script>
+        .replace(scriptRegx, function($1){
 
-        return replaceCallback(srcRegx, $1, parentFile, 'js', options);
-    });
+            return miniInline($1, 'js', options);
+        });
     return content;
 };
 

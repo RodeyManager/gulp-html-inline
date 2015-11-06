@@ -13,7 +13,23 @@ gulp.task('build.html.css', function(){
 
 });
 
+gulp.task('build.html.style', function(){
+
+    gulp.src('inlineStyle.html')
+        .pipe(htmlInline())
+        .pipe(gulp.dest('dist'));
+
+});
+
 gulp.task('build.html.js', function(){
+
+    gulp.src('inlineJs.html')
+        .pipe(htmlInline())
+        .pipe(gulp.dest('dist'));
+
+});
+
+gulp.task('build.html.script', function(){
 
     gulp.src('inlineScript.html')
         .pipe(htmlInline())
@@ -23,8 +39,8 @@ gulp.task('build.html.js', function(){
 
 gulp.task('build.html', function(){
     gulp.src('inline.html')
-        .pipe(htmlInline({ minifyCss: false, minifyJs: true }))
+        .pipe(htmlInline({ minifyCss: true, minifyJs: true }))
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', ['build.html']);
+gulp.task('default', ['build.html', 'build.html.css', 'build.html.style', 'build.html.js', 'build.html.script']);

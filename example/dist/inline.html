@@ -8,33 +8,18 @@
     <meta name="apple-mobile-web-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta name="format-detection" content="telephone=no" />
-    .layout{
-    background-color: white;
-    font-family: "Microsoft YaHei";
-    font-size: 1.2em;
-    color: #000;
-}
-.layout .content{
-    width: 100%;
-    height: 100%;
-    padding: 0px;
-    position: relative;
-}
-.layout .content .left{
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 35%
-    height: 100%;
-}
-.layout .content .right{
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 65%;
-    height: 100%;
-}
-    <link rel="stylesheet" href="assets/css/b.css" ignore="true"/>
+    <style>.layout{background-color:white;font-family:"Microsoft YaHei";font-size:1.2em;color:#000}.layout .content{width:100%;height:100%;padding:0;position:relative}.layout .content .left{position:absolute;left:0;top:0;width:35% height:100%}.layout .content .right{position:absolute;right:0;top:0;width:65%;height:100%}</style>
+    <link rel="stylesheet" href="assets/css/b.css" ignore/>
+    <style>*{padding:0;margin:0}html,body{width:100%;height:100%}body{font-size:1.2em;-webkit-user-select:none;-webkit-appearance:none}</style>
+    <style ignore>
+        #content{
+            padding: 20px;
+            border: 1px solid rgba(0,0,0,.3);
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
 
@@ -50,7 +35,9 @@
 
     <script>;(function(){'use strict';var SYST=function(){this.name='Rodey';};window.SYST=new SYST();}).call(this);</script>
     <script>window.onload=function(){console.log(SYST);};</script>
-    <script src="assets/js/c.js" ignore="true"></script>
+    <script src="assets/js/c.js" ignore></script>
+    <script>var a=0,b=1;var arr=[];arr.push(a);arr.push(b);</script>
+
 
 </body>
 </html>

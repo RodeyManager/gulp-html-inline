@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <title>压缩内联JavaScript</title>
+    <title>替换并压缩script标签链接</title>
     <meta charset="UTF-8"/>
     <meta content="descriptions" charset="">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,19 +23,8 @@
     </div>
 
     <script src="assets/js/a.js"></script>
-    <script src="assets/js/c.js" ignore defer></script>
-    <script ignore>
-        window.onload = function(){
-            console.log('...ingore...');
-        };
-    </script>
-    <script>
-        var a = 0,
-                b = 1;
-        var arr = [];
-        arr.push(a);
-        arr.push(b);
-    </script>
+    <script src="assets/js/b.js"></script>
+    <script src="assets/js/c.js" ignore></script>
 
 </body>
 </html>
