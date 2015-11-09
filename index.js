@@ -22,7 +22,7 @@ var joint = function(tag, content){
     return '<'+ tag +'>' + content + '</'+ tag +'>';
 };
 
-//Ñ¹ËõÄÚÁªcss´úÂë | js½Å±¾
+//å‹ç¼©å†…è”cssä»£ç  | jsè„šæœ¬
 var miniInline = function(content, type, options){
     var isMinifyCss = options && !!options.minifyCss,
         isMinifyJs  = options && !!options.minifyJs,
@@ -80,12 +80,12 @@ var replaceCallback = function(sourceRegx, match, parentFile, type, options){
 
 };
 
-//¸ù¾İ±êÇ©ÀàĞÍ»ñÈ¡ÄÚÈİ²¢Ñ¹Ëõ
+//æ ¹æ®æ ‡ç­¾ç±»å‹è·å–å†…å®¹å¹¶å‹ç¼©
 var execture = function(file, options){
     //console.log(options);
     var parentFile = path.normalize(file.path);
     var fileContents = file.contents.toString('utf8');
-    //»ñÈ¡µ¥¸ö±êÇ©µÄÌæ»»ÄÚÈİ£¨ÒÑÑ¹Ëõ£©
+    //è·å–å•ä¸ªæ ‡ç­¾çš„æ›¿æ¢å†…å®¹ï¼ˆå·²å‹ç¼©ï¼‰
     var content = fileContents
         //like: <link rel="stylesheet" href="assets/css/a.css" />
         .replace(linkRegx, function($1){
@@ -123,7 +123,7 @@ var execture = function(file, options){
     return content;
 };
 
-//»ñÈ¡ÎÄ¼şÄÚÈİ
+//è·å–æ–‡ä»¶å†…å®¹
 var getFileContent = function(file){
     if(!fs.existsSync(file)) throw new Error('File not find: ' + file);
     var fileContent = fs.readFileSync(file, { encoding: 'utf8' });
@@ -131,20 +131,20 @@ var getFileContent = function(file){
     //file.contents = new Buffer(uglifycss.processString(fileContent, options));
 };
 
-//»ñÈ¡Ñ¹ËõºóµÄÄÚÈİ
+//è·å–å‹ç¼©åçš„å†…å®¹
 var getContent = function(file, options){
 
     var content = execture(file, options);
     return content;
 };
 
-//½«Ñ¹ËõºóµÄÄÚÈİÌæ»»µ½htmlÖĞ
+//å°†å‹ç¼©åçš„å†…å®¹æ›¿æ¢åˆ°htmlä¸­
 var inline = function(options){
     var options = options || {},
         basePath = options.basePath;
-    //ÊÇ·ñÑ¹Ëõcss, Ä¬ÈÏÑ¹Ëõ
+    //æ˜¯å¦å‹ç¼©css, é»˜è®¤å‹ç¼©
     options.minifyCss = 'undefined' === typeof(options.minifyCss) ? true : options.minifyCss;
-    //ÊÇ·ñÑ¹Ëõjs, Ä¬ÈÏÑ¹Ëõ
+    //æ˜¯å¦å‹ç¼©js, é»˜è®¤å‹ç¼©
     options.minifyJs = 'undefined' === typeof(options.minifyJs) ? true : options.minifyJs;
 
     return through2.obj(function(file, enc, next){

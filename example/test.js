@@ -43,15 +43,15 @@ content = content.replace(styleRegx, function($1){
 //console.log(content);
 
 /*var content = getFileContent(html);
-content = content.replace(scriptRegx, function($1){
+ content = content.replace(scriptRegx, function($1){
 
-    var ms = $1.match(/<script\s*[\s\S]*?>/gi);
-    if(ms && ms[0].indexOf('ignore') !== -1)
-        return $1;
-    var mini = jsmin($1).code;
-    console.log(mini);
-    return mini;
-});
+ var ms = $1.match(/<script\s*[\s\S]*?>/gi);
+ if(ms && ms[0].indexOf('ignore') !== -1)
+ return $1;
+ var mini = jsmin($1).code;
+ console.log(mini);
+ return mini;
+ });
 
-console.log(content);*/
+ console.log(content);*/
 
