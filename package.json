@@ -1,6 +1,6 @@
 {
   "name": "gulp-html-inline",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "压缩html中的css和js（可将link和script中的href或者src引入的文件直接压缩替换到html中）",
   "main": "index.js",
   "scripts": {
@@ -23,11 +23,7 @@
   },
   "homepage": "https://github.com/RodeyManager/gulp-html-inline#readme",
   "devDependencies": {
-    "gulp": "^3.9.0",
-    "gulp-util": "^3.0.7",
-    "jsmin2": "^1.1.7",
-    "through2": "^2.0.0",
-    "uglifycss": "0.0.18"
+    "gulp": "^3.9.0"
   },
   "dependencies": {
     "gulp-util": "^3.0.7",
