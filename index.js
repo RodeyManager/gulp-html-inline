@@ -58,11 +58,12 @@ var replaceCallback = function(sourceRegx, match, parentFile, type, options){
     var attr = ms[1] || '',
         href = ms[2] || '';
 
+    if(/ignore/gi.test(match))
+        return match;
+
     var sourceFile = path.normalize(path.dirname(parentFile) + path.sep + href),
         content = getFileContent(sourceFile);
 
-    if(/ignore/gi.test(match))
-        return match;
     if('css' === type){
         if(!isMinifyCss)
             return joint('style', content);
