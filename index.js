@@ -86,38 +86,43 @@ var execture = function(file, options){
     //console.log(options);
     var parentFile = path.normalize(file.path);
     var fileContents = file.contents.toString('utf8');
+    if(typeof fileContents === 'undefined'){
+        fileContents = getFileContent(file.path);
+    }
     //获取单个标签的替换内容（已压缩）
     var content = fileContents
-        //like: <link rel="stylesheet" href="assets/css/a.css" />
         .replace(linkRegx, function($1){
 
+            //like: <link rel="stylesheet" href="assets/css/a.css" />
             return replaceCallback(hrefRegx, $1, parentFile, 'css', options);
-        })
-        //like: <script src="assets/js/a.js"></script>
-        .replace(jsRegx, function($1){
+
+        }).replace(jsRegx, function($1){
+
+            //like: <script src="assets/js/a.js"></script>
             //console.log($1);
             return replaceCallback(srcRegx, $1, parentFile, 'js', options);
-        })
-        //like:
-        // <style ignore>
-        //  #app{
-        //      width: 80%;
-        //      padding: 10px;
-        //  }
-        // </style>
-        .replace(styleRegx, function($1){
+
+        }).replace(styleRegx, function($1){
+
+            //like:
+            // <style ignore>
+            //  #app{
+            //      width: 80%;
+            //      padding: 10px;
+            //  }
+            // </style>
             //console.log($1);
             return miniInline($1, 'css', options);
-        })
-        //like:
-        // <script ignore>
-        //      var a = 0,
-        //          b = 0;
-        //      var arr = [];
-        //      arr.push(a);
-        //      arr.push(b);
-        // </script>
-        .replace(scriptRegx, function($1){
+
+        }).replace(scriptRegx, function($1){
+            //like:
+            // <script ignore>
+            //      var a = 0,
+            //          b = 0;
+            //      var arr = [];
+            //      arr.push(a);
+            //      arr.push(b);
+            // </script>
 
             return miniInline($1, 'js', options);
         });
