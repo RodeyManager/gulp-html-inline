@@ -22,16 +22,38 @@ var joint = function(tag, content){
     return '<'+ tag +'>' + content + '</'+ tag +'>';
 };
 
+/**
+ * 获取get模式下url中的指定参数值
+ * @param name      参数名
+ * @param url       传入的url地址
+ * @returns {*}
+ */
+var getParams = function(name, url) {
+    var reg = new RegExp('(^|&)' + name + '=?([^&]*)(&|$)', 'i'), search = '';
+    if(url && url !== ''){
+        search = (url.split('?')[1] || '').match(reg);
+    }else{
+        search = window.location.search.substr(1).match(reg);
+    }
+    if(search && search[0].indexOf(name) !== -1) {
+        return search[2] ? decodeURI(search[2]) : null;
+    }
+};
+
 //压缩内联css代码 | js脚本
 var miniInline = function(content, type, options){
     var isMinifyCss = options && !!options.minifyCss,
         isMinifyJs  = options && !!options.minifyJs,
+        ignore      = options['ignore'] || 'ignore',
+        basePath    = options['basePath'] || '',
+        queryKey    = options['queryKey'] || '_toinline',
+        queryRegx   = new RegExp('&*'+ queryKey +'[=|&]?', 'i'),
         code = content,
         tags;
-    //console.log(content);
+
     tags = content.match(/<[\s\S]*?<*\/*[\s\S]*?>/gi);
-    //console.log(tags);
-    if(tags && tags[0] && tags[0].indexOf('ignore') !== -1)
+
+    if(tags && tags[0] && tags[0].indexOf(ignore) !== -1)
         return content;
 
     if('css' === type){
@@ -50,19 +72,36 @@ var replaceCallback = function(sourceRegx, match, parentFile, type, options){
 
     var ms = sourceRegx.exec(match),
         code = '',
+        query,
         isMinifyCss = options && !!options.minifyCss,
-        isMinifyJs  = options && !!options.minifyJs;
+        isMinifyJs  = options && !!options.minifyJs,
+        ignore      = options['ignore'] || 'ignore',
+        basePath    = options['basePath'] || '',
+        queryKey    = options['queryKey'] || '_toinline',
+        queryRegx   = new RegExp('&*'+ queryKey +'[=|&]?', 'i');
+
     if(!ms || !ms[2] || '' === ms[2]){
         return miniInline(match, type, options);
     }
     var attr = ms[1] || '',
         href = ms[2] || '';
 
-    if(/ignore/gi.test(match))
-        return match;
+    if(match.indexOf(ignore) !== -1)
+            return match.replace(queryRegx, '');
 
-    var sourceFile = path.normalize(path.dirname(parentFile) + path.sep + href),
-        content = getFileContent(sourceFile);
+    //在url地址上加上 _toinline_字段就可以直接嵌入网页
+    query = getParams(queryKey, href);
+
+    if(query === undefined){
+        return match.replace(queryRegx, '');
+    }
+
+    var sourceFile = path.normalize(path.dirname(parentFile) + path.sep + basePath + href.split('?')[0]);
+
+    if(!fs.existsSync(sourceFile)){
+        return match;
+    }
+    content = getFileContent(sourceFile);
 
     if('css' === type){
         if(!isMinifyCss)

@@ -15,6 +15,7 @@ combo and minify `css` and `js` to html. no matter the file is online or not.
 
 + css、js自动内联
 + css、js可选择压缩
++ css、js文件的url上道上query为 "_toinline"，即表示内联
 + 支持过滤[ 在link或者script标签上添加ignore属性即可 ]
 
 ## Usage
@@ -31,8 +32,8 @@ gulp.src('inline.html')
 ## Html
 ```html
     <!-- link tag -->
-    <link rel="stylesheet" href="assets/css/a.css"/>
-    <link rel="stylesheet" href="assets/css/b.css" ignore/>
+    <link rel="stylesheet" href="assets/css/a.css?_toinline"/>
+    <link rel="stylesheet" href="assets/css/b.css?_toinline" ignore/>
 
     <!-- style tag -->
     <style ignore>
@@ -46,9 +47,9 @@ gulp.src('inline.html')
     </style>
 
     <!-- script tag -->
-    <script src="assets/js/a.js"></script>
-    <script src="assets/js/b.js"></script>
-    <script src="assets/js/c.js" ignore></script>
+    <script src="assets/js/a.js?_toinline"></script>
+    <script src="assets/js/b.js?_toinline"></script>
+    <script src="assets/js/c.js?_toinline" ignore></script>
     <script>
         var a = 0,
                 b = 1;
@@ -58,20 +59,16 @@ gulp.src('inline.html')
     </script>
 
 ```
-```html
-<!-- builder: main.min.js -->
-<script src="assets/js/a.js"></script>
-<script src="assets/js/b.js"></script>
-<script src="assets/js/c.js"></script>
-<!-- builder end -->
-```
-
 ## Options
 ```javascript
 gulp.src('./src/*.html')
         .pipe(htmlInline({
+            queryKey: '_toinline', //指定需要内联的url后面必须带的query key， 默认 _toinline
+            ignore: 'ignore', //指定忽略内联的标签上必须添加的属性
             minifyCss: true, // 选择是否压缩css
-            minifyJs: true  // 选择是否压缩js
+            minifyJs: true  // 选择是否压缩js,
+            //资源文件相对当前页面文件的上级路径取值
+            basePath: '../'
         }))
 // ...
 ```

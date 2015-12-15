@@ -39,7 +39,12 @@ gulp.task('build.html.script', function(){
 
 gulp.task('build.html', function(){
     gulp.src('inline.html')
-        .pipe(htmlInline({ minifyCss: true, minifyJs: true }))
+        .pipe(htmlInline({
+            queryKey: '_toinline',
+            ignore: 'ignore',
+            minifyCss: true,
+            minifyJs: true
+        }))
         .pipe(gulp.dest('dist'));
 });
 
