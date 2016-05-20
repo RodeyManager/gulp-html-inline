@@ -1,6 +1,6 @@
 {
   "name": "gulp-html-inline",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "压缩html中的css和js（可将link和script中的href或者src引入的文件直接压缩替换到html中）",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,9 @@
     "css",
     "script"
   ],
-  "author": "Rodey",
+  "author": {
+    "name": "Rodey"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/RodeyManager/gulp-html-inline/issues"
@@ -30,5 +32,28 @@
     "jsmin2": "^1.1.7",
     "through2": "^2.0.0",
     "uglifycss": "0.0.18"
-  }
+  },
+  "gitHead": "51b90a75d4561a42231803ab24c49a63e82aaf0d",
+  "_id": "gulp-html-inline@0.0.8",
+  "_shasum": "5125a3f527b2e9463bc063777c5f0af38fa62750",
+  "_from": "gulp-html-inline@0.0.8",
+  "_npmVersion": "2.11.3",
+  "_nodeVersion": "0.12.7",
+  "_npmUser": {
+    "name": "rodey",
+    "email": "rodeyluo@gmail.com"
+  },
+  "dist": {
+    "shasum": "5125a3f527b2e9463bc063777c5f0af38fa62750",
+    "tarball": "https://registry.npmjs.org/gulp-html-inline/-/gulp-html-inline-0.0.8.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "rodey",
+      "email": "rodeyluo@gmail.com"
+    }
+  ],
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/gulp-html-inline/-/gulp-html-inline-0.0.8.tgz",
+  "readme": "ERROR: No README data found!"
 }

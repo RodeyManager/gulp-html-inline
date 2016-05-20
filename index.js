@@ -7,6 +7,7 @@ var fs          = require('fs'),
     through2    = require('through2'),
     uglifycss   = require('uglifycss'),
     jsmin       = require('jsmin2'),
+    crypto      = require('crypto'),
     PluginError = require('gulp-util').PluginError;
 
 var PLUGIN_NAME = 'gulp-html-inline';
@@ -89,10 +90,19 @@ var replaceCallback = function(sourceRegx, match, parentFile, type, options){
     if(match.indexOf(ignore) !== -1)
             return match.replace(queryRegx, '');
 
-    //在url地址上加上 _toinline_字段就可以直接嵌入网页
+    if(/^\?/i.test(href)){
+        return '';
+    }
+
+    //在url地址上加上 _toinline字段就可以直接嵌入网页
     query = getParams(queryKey, href);
 
     if(query === undefined){
+
+        if(/\?_toHash/gi.test(href)){
+            var hash = getFileHash(Date.now() + '_' + Math.random() * 100000, 8);
+            return match.replace(/\?_toHash/gi, '?_rvc_=' + hash);
+        }
         return match.replace(queryRegx, '');
     }
 
@@ -122,12 +132,13 @@ var replaceCallback = function(sourceRegx, match, parentFile, type, options){
 
 //根据标签类型获取内容并压缩
 var execture = function(file, options){
-    //console.log(options);
+
     var parentFile = path.normalize(file.path);
     var fileContents = file.contents.toString('utf8');
     if(typeof fileContents === 'undefined'){
         fileContents = getFileContent(file.path);
     }
+
     //获取单个标签的替换内容（已压缩）
     var content = fileContents
         .replace(linkRegx, function($1){
@@ -181,6 +192,12 @@ var getContent = function(file, options){
 
     var content = execture(file, options);
     return content;
+};
+
+//获取文件hash值
+var getFileHash = function(fileContent, size){
+    var fileHash = crypto.createHash('md5').update(fileContent).digest('hex').slice(0, size || 10);
+    return fileHash;
 };
 
 //将压缩后的内容替换到html中
