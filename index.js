@@ -20,7 +20,7 @@ var linkRegx    = new RegExp('<link\\s+[\\s\\S]*?>[\\s\\S]*?<*\\/*>*', 'gi'),
     srcRegx     = new RegExp('\\s*(src)="+([\\s\\S]*?)"');
 
 var joint = function(tag, content){
-    return '<'+ tag +'>' + content + '</'+ tag +'>';
+    return '<'+ tag +' charset="utf-8" defer>' + content + '</'+ tag +'>';
 };
 
 /**
