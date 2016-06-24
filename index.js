@@ -19,8 +19,8 @@ var linkRegx    = new RegExp('<link\\s+[\\s\\S]*?>[\\s\\S]*?<*\\/*>*', 'gi'),
     scriptRegx  = new RegExp('<script\\s*[\\s\\S]*?>[\\s\\S]*?<\\/script>', 'gi'),
     srcRegx     = new RegExp('\\s*(src)="+([\\s\\S]*?)"');
 
-var joint = function(tag, content){
-    return '<'+ tag +' charset="utf-8" defer>' + content + '</'+ tag +'>';
+var joint = function(tag, content, attrs){
+    return '<'+ tag + ' ' + attrs +'>' + content + '</'+ tag +'>';
 };
 
 /**
@@ -117,13 +117,13 @@ var replaceCallback = function(sourceRegx, match, parentFile, type, options){
         if(!isMinifyCss)
             return joint('style', content);
         code = uglifycss.processString(content, options);
-        code = joint('style', code);
+        code = joint('style', code, 'type="text/css" charset="utf-8"');
     }
     else if('js' === type){
         if(!isMinifyJs)
             return joint('script', content);
         code = jsmin(content, options).code.replace(/\n*\t*/gi, '');
-        code = joint('script', code);
+        code = joint('script', code, 'type="text/javascript" charset="utf-8" defer');
     }
 
     return code;
