@@ -8,6 +8,7 @@ var fs          = require('fs'),
     uglifycss   = require('uglifycss'),
     jsmin       = require('jsmin2'),
     crypto      = require('crypto'),
+    url         = require('url'),
     PluginError = require('gulp-util').PluginError;
 
 var PLUGIN_NAME = 'gulp-html-inline';
@@ -16,54 +17,28 @@ var linkRegx    = new RegExp('<link\\s+[\\s\\S]*?>[\\s\\S]*?<*\\/*>*', 'gi'),
     hrefRegx    = new RegExp('\\s*(href)="+([\\s\\S]*?)"'),
     styleRegx   = new RegExp('<style\\s*[\\s\\S]*?>[\\s\\S]*?<\\/style>', 'gi'),
     jsRegx      = new RegExp('<script\\s+[\\s\\S]*?>[\\s\\S]*?<\\/script>', 'gi'),
-    scriptRegx  = new RegExp('<script\\s*[\\s\\S]*?>[\\s\\S]*?<\\/script>', 'gi'),
+    scriptRegx  = new RegExp('<script\\s*(^|src)*?>[\\s\\S]*?<\\/script>', 'gi'),
     srcRegx     = new RegExp('\\s*(src)="+([\\s\\S]*?)"');
 
-var joint = function(tag, content, attrs){
-    return '<'+ tag + ' ' + attrs +'>' + content + '</'+ tag +'>';
+var joint = function(tag, content, attrstr){
+    return '<'+ tag + attrstr +'>' + content + '</'+ tag +'>';
 };
 
-/**
- * 获取get模式下url中的指定参数值
- * @param name      参数名
- * @param url       传入的url地址
- * @returns {*}
- */
-var getParams = function(name, url) {
-    var reg = new RegExp('(^|&)' + name + '=?([^&]*)(&|$)', 'i'), search = '';
-    if(url && url !== ''){
-        search = (url.split('?')[1] || '').match(reg);
-    }else{
-        search = window.location.search.substr(1).match(reg);
-    }
-    if(search && search[0].indexOf(name) !== -1) {
-        return search[2] ? decodeURI(search[2]) : null;
-    }
+var isLocal = function(href){
+    return href && href.slice(0, 2) !== '//' && !url.parse(href).hostname;
 };
 
 //压缩内联css代码 | js脚本
 var miniInline = function(content, type, options){
-    var isMinifyCss = options && !!options.minifyCss,
-        isMinifyJs  = options && !!options.minifyJs,
-        ignore      = options['ignore'] || 'ignore',
-        basePath    = options['basePath'] || '',
-        queryKey    = options['queryKey'] || '_toinline',
-        queryRegx   = new RegExp('&*'+ queryKey +'[=|&]?', 'i'),
-        code = content,
-        tags;
-
-    tags = content.match(/<[\s\S]*?<*\/*[\s\S]*?>/gi);
-
-    if(tags && tags[0] && tags[0].indexOf(ignore) !== -1)
-        return content;
+    var isMinifyJs  = options.minifyJs,
+        code        = content;
 
     if('css' === type){
-        if(!isMinifyCss) return content;
         code = uglifycss.processString(content, options);
     }
     else if('js' === type){
         if(!isMinifyJs) return content;
-        code = jsmin(content, options).code.replace(/\n*\t*/gi, '');
+        code = jsmin(content, options).code.replace(/(\n|\t)*/gi, '');
     }
     return code;
 };
@@ -73,61 +48,66 @@ var replaceCallback = function(sourceRegx, match, parentFile, type, options){
 
     var ms = sourceRegx.exec(match),
         code = '',
-        query,
-        isMinifyCss = options && !!options.minifyCss,
-        isMinifyJs  = options && !!options.minifyJs,
-        ignore      = options['ignore'] || 'ignore',
-        basePath    = options['basePath'] || '',
-        queryKey    = options['queryKey'] || '_toinline',
-        queryRegx   = new RegExp('&*'+ queryKey +'[=|&]?', 'i');
+        content = '',
+        attrString = ' charset="utf-8" ',
+        isMinifyJs  = options.minifyJs,
+        basePath    = options.basePath,
+        tohashRegx   = options.tohashRegx;
 
     if(!ms || !ms[2] || '' === ms[2]){
         return miniInline(match, type, options);
     }
-    var attr = ms[1] || '',
-        href = ms[2] || '';
+    var href = ms[2] || '';
 
-    if(match.indexOf(ignore) !== -1)
-            return match.replace(queryRegx, '');
+    if(!isLocal(href))      return href;
+    if(/^\?/i.test(href))   return '';
 
-    if(/^\?/i.test(href)){
-        return '';
-    }
+    //在url地址上加上 _toInline 字段就可以直接嵌入网页
+    //如果href上面不存在 _toInline 字符或者options中指定的toInlne字符
+    if(href.search(options.toinlineRegx) === -1){
 
-    //在url地址上加上 _toinline字段就可以直接嵌入网页
-    query = getParams(queryKey, href);
-
-    if(query === undefined){
-
-        if(/\?_toHash/gi.test(href)){
-            var hash = getFileHash(Date.now() + '_' + Math.random() * 100000, 8);
-            return match.replace(/\?_toHash/gi, '?_rvc_=' + hash);
+        var hash = '';
+        //如果存在 _toHash 字符
+        if(href.search(tohashRegx) !== -1){
+            content = _getContents();
+            if(content != null){
+                hash = getFileHash(content, 8);
+            }else{
+                hash = getFileHash(Date.now() + '_' + Math.random() * 100000, 8);
+            }
+            return match.replace(tohashRegx, function(mh, $1){
+                return $1 + options.queryKey +'=' + hash;
+            });
         }
-        return match.replace(queryRegx, '');
-    }
-
-    var sourceFile = path.normalize(path.dirname(parentFile) + path.sep + basePath + href.split('?')[0]);
-
-    if(!fs.existsSync(sourceFile)){
         return match;
     }
-    content = getFileContent(sourceFile);
+
+    content = _getContents();
+    if(content == null) return match;
 
     if('css' === type){
-        if(!isMinifyCss)
-            return joint('style', content);
         code = uglifycss.processString(content, options);
-        code = joint('style', code, 'type="text/css" charset="utf-8"');
+        code = joint('style', code, attrString + 'type="text/css"');
     }
     else if('js' === type){
         if(!isMinifyJs)
-            return joint('script', content);
-        code = jsmin(content, options).code.replace(/\n*\t*/gi, '');
-        code = joint('script', code, 'type="text/javascript" charset="utf-8" defer');
+            return joint('script', '\n\t' + content + '\n\t', attrString + 'type="text/javascript" defer');
+        code = jsmin(content, options).code.replace(/(\n|\t)*/gi, '');
+        code = joint('script', code, attrString + 'type="text/javascript" defer');
     }
 
     return code;
 
+    function _getContents(){
+        var tempFilePath;
+        if(basePath && '' !== basePath){
+            tempFilePath = path.resolve(basePath, href);
+        }else{
+            tempFilePath = path.resolve(path.dirname(parentFile), href);
+        }
+        tempFilePath = tempFilePath.replace(/\?[^\?]*/gi, '');
+        return getFileContent(tempFilePath);
+    }
 };
 
 //根据标签类型获取内容并压缩
@@ -141,18 +121,7 @@ var execture = function(file, options){
 
     //获取单个标签的替换内容（已压缩）
     var content = fileContents
-        .replace(linkRegx, function($1){
-
-            //like: <link rel="stylesheet" href="assets/css/a.css" />
-            return replaceCallback(hrefRegx, $1, parentFile, 'css', options);
-
-        }).replace(jsRegx, function($1){
-
-            //like: <script src="assets/js/a.js"></script>
-            //console.log($1);
-            return replaceCallback(srcRegx, $1, parentFile, 'js', options);
-
-        }).replace(styleRegx, function($1){
+        .replace(styleRegx, function($1){
 
             //like:
             // <style ignore>
@@ -173,25 +142,45 @@ var execture = function(file, options){
             //      arr.push(a);
             //      arr.push(b);
             // </script>
-
+            //console.log($1);
             return miniInline($1, 'js', options);
+        }).replace(linkRegx, function($1){
+
+            //like: <link rel="stylesheet" href="assets/css/a.css" />
+            return replaceCallback(hrefRegx, $1, parentFile, 'css', options);
+
+        }).replace(jsRegx, function($1){
+
+            //like: <script src="assets/js/a.js"></script>
+            //console.log($1);
+            return replaceCallback(srcRegx, $1, parentFile, 'js', options);
+
         });
+
     return content;
 };
 
 //获取文件内容
 var getFileContent = function(file){
-    if(!fs.existsSync(file)) throw new Error('File not find: ' + file);
-    var fileContent = fs.readFileSync(file, { encoding: 'utf8' });
-    return fileContent;
+    if(!fs.existsSync(file)) return null;
+    return fs.readFileSync(file, { encoding: 'utf8' });
     //file.contents = new Buffer(uglifycss.processString(fileContent, options));
+};
+
+var resetOptions = function(options){
+    options['basePath']     = options['basePath'] || '';
+    options['queryKey']     = options['queryKey'] || '_rvc';
+    options['toInline']     = options['toInline'] || '_toInline';
+    options['toHash']       = options['toHash'] || '_toHash';
+    options['hashSize']     = options['hashSize'] || 8;
+    options['toinlineRegx'] = new RegExp('(\\?|\\&)+' + options['toInline'], 'gi');
+    options['tohashRegx']   = new RegExp('(\\?|\\&)+' + options['toHash'], 'gi');
+    return options;
 };
 
 //获取压缩后的内容
 var getContent = function(file, options){
-
-    var content = execture(file, options);
-    return content;
+    return execture(file, resetOptions(options));
 };
 
 //获取文件hash值
@@ -202,13 +191,7 @@ var getFileHash = function(fileContent, size){
 
 //将压缩后的内容替换到html中
 var inline = function(options){
-    var options = options || {},
-        basePath = options.basePath;
-    //是否压缩css, 默认压缩
-    options.minifyCss = 'undefined' === typeof(options.minifyCss) ? true : options.minifyCss;
-    //是否压缩js, 默认压缩
-    options.minifyJs = 'undefined' === typeof(options.minifyJs) ? true : options.minifyJs;
-
+    options = options || {};
     return through2.obj(function(file, enc, next){
 
         if (file.isStream()) {

@@ -5,10 +5,15 @@
 var gulp        = require('gulp'),
     htmlInline  = require('../index');
 
+var basePath = process.cwd();
+console.log(basePath);
+
 gulp.task('build.html.css', function(){
 
     gulp.src('inlineCss.html')
-        .pipe(htmlInline())
+        .pipe(htmlInline({
+            //basePath: basePath,
+        }))
         .pipe(gulp.dest('dist'));
 
 });
@@ -16,7 +21,9 @@ gulp.task('build.html.css', function(){
 gulp.task('build.html.style', function(){
 
     gulp.src('inlineStyle.html')
-        .pipe(htmlInline())
+        .pipe(htmlInline({
+            basePath: basePath
+        }))
         .pipe(gulp.dest('dist'));
 
 });
@@ -24,7 +31,9 @@ gulp.task('build.html.style', function(){
 gulp.task('build.html.js', function(){
 
     gulp.src('inlineJs.html')
-        .pipe(htmlInline())
+        .pipe(htmlInline({
+            minifyJs: true
+        }))
         .pipe(gulp.dest('dist'));
 
 });
@@ -40,9 +49,7 @@ gulp.task('build.html.script', function(){
 gulp.task('build.html', function(){
     gulp.src('inline.html')
         .pipe(htmlInline({
-            queryKey: '_toinline',
-            ignore: 'ignore',
-            minifyCss: true,
+            basePath: basePath,
             minifyJs: true
         }))
         .pipe(gulp.dest('dist'));
